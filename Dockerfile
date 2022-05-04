@@ -6,6 +6,7 @@ RUN add-apt-repository ppa:ubuntugis/ppa
 
 # Install libraries for wgrib2 and gdal tools
 RUN apt-get update && apt-get install -y wget \
+    curl \
     build-essential \
     gfortran \
     zlib1g-dev \
@@ -29,6 +30,11 @@ RUN cd ~ \
 RUN cd ~/grib2/ \
     && make \
     && cp wgrib2/wgrib2 /usr/local/bin/wgrib2
+
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get update && apt-get install -y nodejs
+
+RUN npm install -g typescript ts-node
 
 WORKDIR /data
 

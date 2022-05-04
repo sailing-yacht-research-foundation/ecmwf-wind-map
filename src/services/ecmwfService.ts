@@ -2,12 +2,13 @@ import fs, { ReadStream } from 'fs';
 import { promisify } from 'util';
 import * as stream from 'stream';
 import path from 'path';
+import { exec } from 'child_process';
 
 import axios, { AxiosResponse } from 'axios';
 
 import logger from '../logger';
-import { makeDirectory } from '../utils/fileSystem';
 
+const execPromise = promisify(exec);
 const availableTimes = {
   '00': '07:05',
   '12': '19:05',
@@ -50,7 +51,7 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
     .replaceAll('{{MONTH}}', downloadMonth)
     .replaceAll('{{DAY}}', downloadDay)
     .replaceAll('{{RELEASE_TIME}}', releaseTime);
-  for (let i = 9; i <= 18; i += 3) {
+  for (let i = 9; i <= 9; i += 3) {
     filesToDownload.push({
       hour: i,
       url: parsedUrl.replaceAll('{{FORECAST}}', String(i)),
@@ -61,7 +62,7 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
   try {
     await fs.promises.access(folder);
   } catch (error) {
-    await makeDirectory(folder);
+    await fs.promises.mkdir(folder);
   }
 
   const downloadResult = await Promise.all(
@@ -88,7 +89,66 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
       }
     }),
   );
-  return downloadResult;
+  return downloadResult.filter((row) => row != null) as {
+    forecastTime: string;
+    file: string;
+  }[];
 }
 
-export { downloadECMWFFile };
+async function splitUVGribs(sourceFile: string, targetFolder: string) {
+  let isSuccess = false;
+  const uFilePath = path.resolve(`${targetFolder}/u.grib`);
+  const vFilePath = path.resolve(`${targetFolder}/v.grib`);
+  try {
+    await execPromise(
+      `wgrib2 ${sourceFile} -match ":UGRD:10 m above ground:" -grib_out ${uFilePath}`,
+    );
+    await execPromise(
+      `wgrib2 ${sourceFile} -match ":VGRD:10 m above ground:" -grib_out ${vFilePath}`,
+    );
+    isSuccess = true;
+  } catch (error) {
+    logger.error(`Error splitting grib to U & V gribs`);
+  }
+  return {
+    isSuccess,
+    uFilePath,
+    vFilePath,
+  };
+}
+
+async function buildVRT(params: {
+  uFilePath: string;
+  vFilePath: string;
+  vrtFilePath: string;
+}) {
+  const { uFilePath, vFilePath, vrtFilePath } = params;
+  let isSuccess = false;
+  try {
+    await execPromise(
+      `gdalbuildvrt -separate ${vrtFilePath} ${uFilePath} ${vFilePath} -a_srs EPSG:4326`,
+    );
+    isSuccess = true;
+  } catch (error) {
+    logger.error(`Error building VRT`);
+  }
+
+  return isSuccess;
+}
+
+async function generateWindParticlePNG(vrtFile: string, pngFilePath: string) {
+  let isSuccess = false;
+  const tifFilePath = vrtFile.replace('.vrt', '.tif');
+  try {
+    await execPromise(
+      `gdal_translate -ot Byte -a_nodata 0 -outsize 1440 720 -b 1 -b 2 -b 2 -scale -128 127 0 255 ${vrtFile} ${tifFilePath}`,
+    );
+    await execPromise(`convert ${tifFilePath} ${pngFilePath}`);
+    isSuccess = true;
+  } catch (error) {
+    logger.error(`Error generating windlet particle PNG`);
+  }
+
+  return isSuccess;
+}
+export { downloadECMWFFile, splitUVGribs, buildVRT, generateWindParticlePNG };
