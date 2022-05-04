@@ -78,9 +78,11 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
         data.pipe(writableStream);
         await finishedDownload(data);
         return {
-          forecastTime: `${downloadYear}-${downloadMonth}-${downloadDay}T${String(
-            hour,
-          ).padStart(2, '0')}:00:00.000Z`,
+          forecastTime: new Date(
+            `${downloadYear}-${downloadMonth}-${downloadDay}T${String(
+              hour,
+            ).padStart(2, '0')}:00:00.000Z`,
+          ),
           file: filePath,
         };
       } catch (error) {
@@ -90,7 +92,7 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
     }),
   );
   return downloadResult.filter((row) => row != null) as {
-    forecastTime: string;
+    forecastTime: Date;
     file: string;
   }[];
 }
