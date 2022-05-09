@@ -8,8 +8,7 @@
     "dev": "ts-node src/processECMWFWind.ts",
     "build": "rm -rf ./build && tsc --project ./",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint \"src/**/*.ts\" --fix",
-    "test": "jest --coverage --detectOpenHandles --forceExit"
+    "lint": "eslint \"src/**/*.ts\" --fix"
   },
   "author": "",
   "license": "ISC",

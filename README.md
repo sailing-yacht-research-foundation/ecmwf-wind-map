@@ -1,5 +1,31 @@
-# ecmwf wind map
+# ecmwf-wind-map
 
+Script to generate wind particle source images and tiles, upload to s3 and serve with cloudfront
+
+---
+
+- [ecmwf-wind-map](#ecmwf-wind-map)
+  - [Installation](#installation)
+  - [Running](#running)
+    - [Regular Mode](#regular-mode)
+    - [Recalculate Mode](#recalculate-mode)
+
+## Installation
+
+1. Run `docker build -t ecmwf_wind_map:1.0 .` to build the docker image
+2. Run `docker run -it --mount type=bind,source=$(pwd),target=/data ecmwf_wind_map:1.0 /bin/bash` in the project folder
+
+## Running
+
+1. Once you've ssh into the docker container, run `ts-node src/procesECMWFWind.ts [RELEASE_TIME]` to start parsing. Make sure RELEASE TIME is either 00 or 12.
+
+TODOS:
+
+- Config the terraform deployments for this script (ECS Scheduled task)
+- Research and implement cloudfront cdn
+- simple Deck.gl web app (We have this one already if using pure js is accepted, I'm using the pure-js sample from deck gl repo to add particle effect)
+
+Info about this project:
 https://docs.google.com/document/d/1clQ2pBx-HviaN2O1543lAYdXWydIDBH9vKVzsK9xmCw/edit
 
 Goal:
@@ -25,5 +51,3 @@ Sergij and Radu will be responsible for adding this map as a layer over the exis
 
 Additional thoughts:
 If we can get this to work well with the ECMWF wind, the next step would be in do it with RTOFS.
-
-docker build -t wind_map_test:1.0 .
