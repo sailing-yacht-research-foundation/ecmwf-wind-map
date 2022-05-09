@@ -25,9 +25,9 @@ const finishedDownload = promisify(stream.finished);
 const isToday = (checkDate: Date) => {
   const today = new Date();
   return (
-    checkDate.getUTCDate() == today.getUTCDate() &&
-    checkDate.getUTCMonth() == today.getUTCMonth() &&
-    checkDate.getUTCFullYear() == today.getUTCFullYear()
+    checkDate.getUTCDate() === today.getUTCDate() &&
+    checkDate.getUTCMonth() === today.getUTCMonth() &&
+    checkDate.getUTCFullYear() === today.getUTCFullYear()
   );
 };
 // Accepting releaseDate in this function for easier testing, in general, releaseDate will always be today's date

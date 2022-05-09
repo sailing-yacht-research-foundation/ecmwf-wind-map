@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import stream from 'stream';
 
-export default function uploadStreamToS3(
+function uploadStreamToS3(
   bucket: string,
   key: string,
 ): {
@@ -21,3 +21,5 @@ export default function uploadStreamToS3(
   });
   return { writeStream: new stream.PassThrough(), uploadPromise: mockPromise };
 }
+
+export { uploadStreamToS3 };

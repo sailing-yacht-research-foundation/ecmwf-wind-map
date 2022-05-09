@@ -1,4 +1,5 @@
 import { promises as fs, createReadStream } from 'fs';
+import stream from 'stream';
 import * as path from 'path';
 import { S3 } from 'aws-sdk';
 
@@ -37,4 +38,24 @@ async function uploadFolderToS3(
   return Promise.all(uploads);
 }
 
-export default uploadFolderToS3;
+function uploadStreamToS3(
+  bucket: string,
+  key: string,
+): {
+  writeStream: stream.PassThrough;
+  uploadPromise: Promise<S3.ManagedUpload.SendData>;
+} {
+  const passThrough = new stream.PassThrough();
+
+  const uploadPromise = s3
+    .upload({
+      Bucket: bucket,
+      Key: key,
+      Body: passThrough,
+    })
+    .promise();
+
+  return { writeStream: passThrough, uploadPromise };
+}
+
+export { uploadFolderToS3, uploadStreamToS3 };

@@ -11,8 +11,7 @@ import {
   generateWindParticlePNG,
   splitUVGribs,
 } from './services/ecmwfService';
-import uploadFolderToS3 from './utils/uploadFolderToS3';
-import uploadStreamToS3 from './utils/uploadStreamToS3';
+import { uploadFolderToS3, uploadStreamToS3 } from './utils/s3utils';
 
 let selectedReleaseTime: string | null = null;
 if (process.argv[2]) {
