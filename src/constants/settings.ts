@@ -1,0 +1,2 @@
+export const DEFAULT_ECMWF_WIND_MIN_ZOOM = 0;
+export const DEFAULT_ECMWF_WIND_MAX_ZOOM = 5;

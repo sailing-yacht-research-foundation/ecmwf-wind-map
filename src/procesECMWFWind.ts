@@ -27,20 +27,18 @@ if (
   process.exit(1);
 }
 (async () => {
-  const bucket = process.env.AWS_S3_BUCKET || '';
+  const bucket = process.env.AWS_S3_WIND_BUCKET || '';
   if (!bucket) {
     logger.error('BUCKET NOT SET! Exiting....');
     process.exit(1);
   }
   const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
   logger.info(
     `Processing ECMWF Wind data. Release Time selected: ${selectedReleaseTime}`,
   );
   const donwloadResult = await downloadECMWFFile(
     selectedReleaseTime as '00' | '12',
-    yesterday,
+    today,
   );
   for (let { file, forecastTime } of donwloadResult) {
     const folderName = file.split('operating_folder/')[1].replace('.grib', '');

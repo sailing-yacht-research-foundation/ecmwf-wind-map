@@ -7,6 +7,10 @@ import { exec } from 'child_process';
 import axios, { AxiosResponse } from 'axios';
 
 import logger from '../logger';
+import {
+  DEFAULT_ECMWF_WIND_MAX_ZOOM,
+  DEFAULT_ECMWF_WIND_MIN_ZOOM,
+} from '../constants/settings';
 
 const execPromise = promisify(exec);
 const availableTimes = {
@@ -51,7 +55,7 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
     .replaceAll('{{MONTH}}', downloadMonth)
     .replaceAll('{{DAY}}', downloadDay)
     .replaceAll('{{RELEASE_TIME}}', releaseTime);
-  for (let i = 9; i <= 9; i += 3) {
+  for (let i = 9; i <= 18; i += 3) {
     filesToDownload.push({
       hour: i,
       url: parsedUrl.replaceAll('{{FORECAST}}', String(i)),
@@ -165,10 +169,14 @@ async function generateECMWFWindTiles(data: {
   outputFolder: string;
 }) {
   const { tifFilePath, outputFolder } = data;
+  const minZoom =
+    process.env.ECMWF_WIND_MIN_ZOOM ?? DEFAULT_ECMWF_WIND_MIN_ZOOM;
+  const maxZoom =
+    process.env.ECMWF_WIND_MAX_ZOOM ?? DEFAULT_ECMWF_WIND_MAX_ZOOM;
   let isSuccess = false;
   try {
     await execPromise(
-      `gdal2tiles.py --xyz --zoom=0-7 --processes=2 -e --profile=mercator ${tifFilePath} ${outputFolder}`,
+      `gdal2tiles.py --xyz --zoom=${minZoom}-${maxZoom} --processes=2 -e --profile=mercator ${tifFilePath} ${outputFolder}`,
     );
     isSuccess = true;
   } catch (error) {
