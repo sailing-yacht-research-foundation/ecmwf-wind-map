@@ -4,8 +4,8 @@
   "description": "",
   "main": "src/main.ts",
   "scripts": {
-    "start": "node build/main.js",
-    "dev": "ts-node src/main.ts",
+    "start": "node build/processECMWFWind.js",
+    "dev": "ts-node src/processECMWFWind.ts",
     "build": "rm -rf ./build && tsc --project ./",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",

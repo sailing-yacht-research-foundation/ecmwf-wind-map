@@ -138,19 +138,49 @@ async function buildVRT(params: {
   return isSuccess;
 }
 
-async function generateWindParticlePNG(vrtFile: string, pngFilePath: string) {
-  let isSuccess = false;
-  const tifFilePath = vrtFile.replace('.vrt', '.tif');
+async function generateWindParticlePNG(data: {
+  vrtFilePath: string;
+  pngFilePath: string;
+  tifFilePath: string;
+}) {
+  let tifGenerated = false;
+  let pngGenerated = false;
+  const { vrtFilePath, pngFilePath, tifFilePath } = data;
   try {
     await execPromise(
-      `gdal_translate -ot Byte -a_nodata 0 -outsize 1440 720 -b 1 -b 2 -b 2 -scale -128 127 0 255 ${vrtFile} ${tifFilePath}`,
+      `gdal_translate -ot Byte -a_nodata 0 -outsize 1440 720 -b 1 -b 2 -b 2 -scale -128 127 0 255 ${vrtFilePath} ${tifFilePath}`,
     );
+    tifGenerated = true;
     await execPromise(`convert ${tifFilePath} ${pngFilePath}`);
-    isSuccess = true;
+    pngGenerated = true;
   } catch (error) {
     logger.error(`Error generating windlet particle PNG`);
   }
 
+  return { tifGenerated, pngGenerated };
+}
+
+async function generateECMWFWindTiles(data: {
+  tifFilePath: string;
+  outputFolder: string;
+}) {
+  const { tifFilePath, outputFolder } = data;
+  let isSuccess = false;
+  try {
+    await execPromise(
+      `gdal2tiles.py --xyz --zoom=0-7 --processes=2 -e --profile=mercator ${tifFilePath} ${outputFolder}`,
+    );
+    isSuccess = true;
+  } catch (error) {
+    logger.error(`Error generating wind data tiles`);
+  }
+
   return isSuccess;
 }
-export { downloadECMWFFile, splitUVGribs, buildVRT, generateWindParticlePNG };
+export {
+  downloadECMWFFile,
+  splitUVGribs,
+  buildVRT,
+  generateWindParticlePNG,
+  generateECMWFWindTiles,
+};

@@ -1,8 +1,8 @@
 
-FROM ubuntu:18.04
+FROM osgeo/gdal:ubuntu-small-3.1.0
+
 RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:ubuntugis/ppa
 
 # Install libraries for wgrib2 and gdal tools
 RUN apt-get update && apt-get install -y wget \
@@ -10,11 +10,6 @@ RUN apt-get update && apt-get install -y wget \
     build-essential \
     gfortran \
     zlib1g-dev \
-    python3.6-dev \
-    binutils \
-    libproj-dev \
-    gdal-bin \
-    python-gdal \
     imagemagick
 
 # Setting for libraries
