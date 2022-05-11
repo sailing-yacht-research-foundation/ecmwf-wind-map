@@ -9,6 +9,7 @@ Script to generate wind particle source images and tiles, upload to s3 and serve
   - [Running](#running)
     - [Regular Mode](#regular-mode)
     - [Recalculate Mode](#recalculate-mode)
+  - [Deployment](#deployment)
 
 ## Installation
 
@@ -18,6 +19,12 @@ Script to generate wind particle source images and tiles, upload to s3 and serve
 ## Running
 
 1. Once you've ssh into the docker container, run `ts-node src/procesECMWFWind.ts [RELEASE_TIME]` to start parsing. Make sure RELEASE TIME is either 00 or 12.
+
+## Deployment
+
+Run terraform deployments with this command:
+
+- `docker-compose -f deployment/docker-compose.yml --env-file deployment/.env run --rm terraform [apply/fmt/destroy/plan]`
 
 TODOS:
 
