@@ -1,12 +1,5 @@
-FROM node:16-alpine AS builder
-WORKDIR /usr/src/app
-COPY ["package*.json", "tsconfig.json",  "./"]
-RUN npm ci
-COPY ./src ./src
-RUN npm run build
 
 FROM osgeo/gdal:ubuntu-small-3.1.0
-WORKDIR /data
 
 RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN apt-get install software-properties-common -y
@@ -36,6 +29,8 @@ RUN cd ~/grib2/ \
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get update && apt-get install -y nodejs
 
-COPY package*.json ./
-RUN npm install --production --silent
-COPY --from=builder /usr/src/app/build/ build/
+RUN npm install -g typescript ts-node
+
+WORKDIR /data
+
+CMD [ "/bin/bash" ]

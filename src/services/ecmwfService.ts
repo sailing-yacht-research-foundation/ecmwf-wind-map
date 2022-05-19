@@ -81,12 +81,17 @@ async function downloadECMWFFile(releaseTime: '00' | '12', releaseDate: Date) {
         const { data } = response;
         data.pipe(writableStream);
         await finishedDownload(data);
+        let forecastTime = new Date(
+          `${downloadYear}-${downloadMonth}-${downloadDay}T${releaseTime.padStart(
+            2,
+            '0',
+          )}:00:00.000Z`,
+        );
+        forecastTime.setUTCHours(forecastTime.getUTCHours() + hour);
+
+        hour;
         return {
-          forecastTime: new Date(
-            `${downloadYear}-${downloadMonth}-${downloadDay}T${String(
-              hour,
-            ).padStart(2, '0')}:00:00.000Z`,
-          ),
+          forecastTime,
           file: filePath,
         };
       } catch (error) {
