@@ -75,4 +75,4 @@ jobs:
           env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          run: docker-compose -f deployment/docker-compose.yml run --rm terraform apply -auto-approve -input=false
+          run: docker-compose -f deployment/docker-compose.yml run --rm terraform destroy -auto-approve -input=false
