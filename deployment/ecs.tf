@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "ecmwf_wind_map_task" {
 resource "aws_cloudwatch_event_rule" "ecmwf_wind_map_rule" {
   name                = "ecmwf-wind-map-daily"
   description         = "Runs the ECMWF Wind Map download and tiling at 07:30 & 19:30 UTC"
-  schedule_expression = "cron(30 3,7,19 * * ? *)"
+  schedule_expression = "cron(30 7,19 * * ? *)"
   is_enabled          = true
 }
 
